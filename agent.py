@@ -21,38 +21,64 @@ class WordleAgent(ABC):
         self.possible = possible
         self.saved_string = possible
 
-        #Finds best word guess from list of allowed guesses
+        #Finds best word guess from the list of allowed guesses
         best_word = ("", 0)
         for word in self.allowed:
-        
             score = self.find_exp_value(word)
             if score > best_word[1]:
                 best_word = (word, score)
-                
-        self.fir_guess = best_word[0]
+        self.first_word_guess = best_word[0]
 
         
     def find_exp_value(self, a_word):
+        '''
+        Calculates the "expected value" for the input word (based on 
+        the number of greys, greens and yellows.)
 
-        #calculates expected value for input word by scoring each possible solution word
+        Parameters
+        ----------
+        a_word : str
+            The word being considered as a guess from the list of allowed guesses.
+
+        Returns
+        -------
+            The average score across all possible final words.
+        '''
         word_sum = 0.0
         for poss in self.possible:
             for i in range(0,5):
-                word_sum += self.helper_letter(a_word, poss, i)
+                #gets value for each letter in (each) possible word
+                word_sum += self.get_letter_score(a_word, poss, i)
         return word_sum / len(self.possible)
 
 
-    def helper_letter(self, a_word, poss, i):
+    
+    def get_letter_score(self, a_word, poss, i):
+        ''' Calculates score for a letter.
+        
+        Parameters
+            ----------
+            a_word : str
+                The word being considered as a guess from the list of allowed guesses.
+            poss : str
+                The word whose score is being calculated from the list of possible final words. 
+            i : int
+                Value to index a letter from the word
 
-            #grey
-            if poss[i] not in a_word:
-                return 0.0
-            #green
-            if poss[i] == a_word[i]:
-                return 2.0
-            #yellow
-            else: 
-                return 1.0
+            Returns
+            -------
+            int
+                The value for the given letter in the possible final word.
+        '''
+        #grey
+        if poss[i] not in a_word:
+            return 0.0
+        #green
+        if poss[i] == a_word[i]:
+            return 2.0
+        #yellow
+        else: 
+            return 1.0
 
       
 
@@ -71,7 +97,7 @@ class WordleAgent(ABC):
         """
 
         self.possible = self.saved_string
-        return self.fir_guess
+        return self.first_word_guess
 
     #@abstractmethod
     def next_guess(self):
